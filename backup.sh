@@ -60,6 +60,7 @@ done
 echo
 echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE"
 restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE)
+echo
 
 RESTIC_LOGS=$(cat $LOG_FILE | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
 
@@ -89,7 +90,7 @@ log Backup complete!
 
 # Set temp env vars
 OUTPUT_SIZE="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
-OUTPUT_DATE="$(date)"
+OUTPUT_DATE="$(date --iso-8601=seconds)"
 
 # send embed to discord.
 curl -X POST -H "Content-Type: application/json" -d "$(generate_success_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN

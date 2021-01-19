@@ -13,7 +13,7 @@ generate_success_embed() {
             "description": "The backup completed without errors. UwU~!",
             "url": "https://discordapp.com",
             "color": 5832536,
-            "timestamp": "$(date --iso-8601=seconds)",
+            "timestamp": "$OUTPUT_DATE",
             "footer": {
                 "text": "Backup performed at"
             },
@@ -21,6 +21,10 @@ generate_success_embed() {
                 {
                     "name": "Restic Logs",
                     "value": "\`\`\`$RESTIC_LOGS\`\`\`"
+                },
+                {
+                    "name": "Repository Size",
+                    "value": "$OUTPUT_SIZE"
                 }
             ],
             "thumbnail": {
