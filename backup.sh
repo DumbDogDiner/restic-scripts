@@ -87,26 +87,26 @@ if [[ ! $restic_result ]]; then
     exit
 fi
 
-log Backup complete! Computing statistics...
+log Backup complete!
 
-# calculate statistics
-echo
-echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats"
-RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats)"
-echo $RESTIC_STATS
-echo
+# # calculate statistics
+# echo
+# echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats"
+# RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats)"
+# echo $RESTIC_STATS
+# echo
 
-OUTPUT_DATE="$(date --iso-8601=seconds)"
-OUTPUT_SNAPSHOTS=$(echo $RESTIC_STATS | grep -Eo "Snapshots processed:   [0-9]+" | sed -n -e 's/.*Snapshots processed://p' | xargs)
-OUTPUT_FILES=$(echo $RESTIC_STATS | grep -Eo "Total File Count:   [0-9]+" | sed -n -e 's/.*Total File Count://p' | xargs)
-OUTPUT_SIZE=$(echo $RESTIC_STATS | grep -Eo "Total Size:   [0-9]+\.[0-9]+ (T|G)iB" | sed -n -e 's/.*Total Size://p' | xargs)
+# OUTPUT_DATE="$(date --iso-8601=seconds)"
+# OUTPUT_SNAPSHOTS=$(echo $RESTIC_STATS | grep -Eo "Snapshots processed:   [0-9]+" | sed -n -e 's/.*Snapshots processed://p' | xargs)
+# OUTPUT_FILES=$(echo $RESTIC_STATS | grep -Eo "Total File Count:   [0-9]+" | sed -n -e 's/.*Total File Count://p' | xargs)
+# OUTPUT_SIZE=$(echo $RESTIC_STATS | grep -Eo "Total Size:   [0-9]+\.[0-9]+ (T|G)iB" | sed -n -e 's/.*Total Size://p' | xargs)
 
-# debug logs
-log Backup performed at $OUTPUT_DATE
-printf "\t- %s\n" "Snapshots processed: $OUTPUT_SNAPSHOTS"
-printf "\t- %s\n" "Total file count: $OUTPUT_FILES"
-printf "\t- %s\n" "Total size: $OUTPUT_SIZE"
-echo
+# # debug logs
+# log Backup performed at $OUTPUT_DATE
+# printf "\t- %s\n" "Snapshots processed: $OUTPUT_SNAPSHOTS"
+# printf "\t- %s\n" "Total file count: $OUTPUT_FILES"
+# printf "\t- %s\n" "Total size: $OUTPUT_SIZE"
+# echo
 
 # send embed to discord.
 curl -X POST -H "Content-Type: application/json" -d "$(generate_success_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
