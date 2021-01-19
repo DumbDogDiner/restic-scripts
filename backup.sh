@@ -87,21 +87,23 @@ if [[ ! $restic_result ]]; then
 fi
 
 log Backup complete! Computing statistics...
+
+# calculate statistics
+echo
+echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats"
+RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats)"
 echo
 
-# Set temp env vars
-RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats)"
-
 OUTPUT_DATE="$(date --iso-8601=seconds)"
-OUTPUT_SNAPSHOTS=$(echo $RESTIC_STATS | sed -n -e 's/.*Snapshots processed:   //p' | tr ',' ' ')
-OUTPUT_FILES=$(echo $RESTIC_STATS | sed -n -e 's/.*Total File Count:   //p' | tr ',' ' ')
-OUTPUT_SIZE=$(echo $RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')
+OUTPUT_SNAPSHOTS=$(echo $RESTIC_STATS | sed -n -e 's/.*Snapshots processed://p' | xargs)
+OUTPUT_FILES=$(echo $RESTIC_STATS | sed -n -e 's/.*Total File Count://p' | xargs)
+OUTPUT_SIZE=$(echo $RESTIC_STATS | sed -n -e 's/.*Total Size://p' | xargs)
 
 # debug logs
 log Backup performed at $OUTPUT_DATE
-log Snapshots processed: $OUTPUT_SNAPSHOTS
-log Total file count: $OUTPUT_FILES
-log Total size: $OUTPUT_SIZE
+printf "\t- %s\n" "Snapshots processed: $OUTPUT_SNAPSHOTS"
+printf "\t- %s\n" "Total file count: $OUTPUT_FILES"
+printf "\t- %s\n" "Total size: $OUTPUT_SIZE"
 echo
 
 # send embed to discord.
