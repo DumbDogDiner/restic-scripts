@@ -20,7 +20,7 @@ generate_success_embed() {
             "fields": [
                 {
                     "name": "Restic Logs",
-                    "value": "```$RESTIC_LOGS```"
+                    "value": "\`\`\`$RESTIC_LOGS\`\`\`"
                 }
             ],
             "thumbnail": {

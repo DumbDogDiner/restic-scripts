@@ -109,6 +109,7 @@ log Backup complete! Computing statistics...
 # echo
 
 # Set temp env vars
+echo
 echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE"
 RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE)"
 OUTPUT_SIZE="$RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
