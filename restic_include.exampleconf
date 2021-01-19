@@ -1,0 +1,7 @@
+/srv/daemon-data 
+/etc/ufw 
+/usr/local/sbin 
+/etc/systemd/system 
+/etc/nginx 
+/etc/iptables 
+/var/www 
