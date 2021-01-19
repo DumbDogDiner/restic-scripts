@@ -47,7 +47,9 @@ done
 
 # perform the backup
 # only have a 400mbit connection to HE in CA, USA, therefore a 300mbit limit is enforced on uploads
-restic_result=$(restic --limit-upload 300000 --limit-download 300000 --verbose backup "${BACKUP_FILES[@]}" --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE)
+echo
+echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE"
+restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE)
 
 RESTIC_LOGS=$(cat $LOG_FILE | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
 
