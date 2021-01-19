@@ -87,7 +87,7 @@ if [[ ! $restic_result ]]; then
     exit
 fi
 
-log Backup complete!
+log Backup complete! Computing statistics...
 
 # # calculate statistics
 # echo
@@ -107,6 +107,14 @@ log Backup complete!
 # printf "\t- %s\n" "Total file count: $OUTPUT_FILES"
 # printf "\t- %s\n" "Total size: $OUTPUT_SIZE"
 # echo
+
+# Set temp env vars
+echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE"
+RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE)"
+OUTPUT_SIZE="$RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
+OUTPUT_DATE="$(date --iso-8601=seconds)"
+cat $LOG_FILE
+echo
 
 # send embed to discord.
 curl -X POST -H "Content-Type: application/json" -d "$(generate_success_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
