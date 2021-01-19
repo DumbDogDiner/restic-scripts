@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
+UPDATER_VERSION=0.1.0
+
+printf "\n\u001b[35;1mdddMC - restic-scripts \u001b[36;1mv"
+printf $UPDATER_VERSION
+printf "\u001b[0m\n\n"
+
+# pretty log function
+log() {
+    echo $(printf '\e[1;30m')"=> $(printf '\033[m')$@"
+}
 
 # load embed generators
 source ./error.sh
@@ -7,7 +17,7 @@ source ./success.sh
 
 # load configuration
 if [[ ! -f ./backup.conf ]]; then
-    echo Could not find configuration file! Cannot proceed.
+    log Could not find configuration file! Cannot proceed.
     exit 1
 fi;
 
@@ -34,13 +44,13 @@ for el in "${illegal_files[@]}"; do
 done
 
 # log the files we back up
-echo Files to backup:
+log Files to backup:
 for file in "${INCLUDE_FILES[@]}"; do
     printf "\t- %s\n" "$file"
 done
 echo;
 
-echo Files to exclude:
+log Files to exclude:
 for file in "${EXCLUDE_FILES[@]}"; do
      printf "\t- %s\n" "$file"
 done
@@ -54,7 +64,7 @@ restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FI
 RESTIC_LOGS=$(cat $LOG_FILE | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
 
 if [[ ! $restic_result ]]; then
-    echo Backup failed!
+    log Backup failed!
     
     # assign error vars
     RESTIC_ERROR=$(cat $LOG_FILE | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
@@ -71,15 +81,16 @@ if [[ ! $restic_result ]]; then
     fi
 
     curl -X POST -H "Content-Type: application/json" -d "$(generate_error_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
-    echo Sent information to Discord.
+    log Sent information to Discord.
     exit
 fi
 
-# Set temp env vars
-OUTPUT_SIZE="$(restic stats | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
-OUTPUT_DATE="$(date)"
+log Backup complete!
 
+# Set temp env vars
+OUTPUT_SIZE="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
+OUTPUT_DATE="$(date)"
 
 # send embed to discord.
 curl -X POST -H "Content-Type: application/json" -d "$(generate_success_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
-echo Sent information to Discord.
+log Sent information to Discord.
