@@ -86,11 +86,21 @@ if [[ ! $restic_result ]]; then
     exit
 fi
 
-log Backup complete!
+log Backup complete! Computing statistics...
 
 # Set temp env vars
-OUTPUT_SIZE="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
+RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats)"
+
 OUTPUT_DATE="$(date --iso-8601=seconds)"
+OUTPUT_SNAPSHOTS="$RESTIC_STATS | sed -n -e 's/.*Snapshots processed:   //p' | tr ',' ' ')"
+OUTPUT_FILES="$RESTIC_STATS | sed -n -e 's/.*Total File Count:   //p' | tr ',' ' ')"
+OUTPUT_SIZE="$RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
+
+# debug logs
+log Backup performed at $OUTPUT_DATE
+log Snapshots processed: $OUTPUT_SNAPSHOTS
+log Total file count: $OUTPUT_FILES
+log Total size: $OUTPUT_SIZE
 
 # send embed to discord.
 curl -X POST -H "Content-Type: application/json" -d "$(generate_success_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN

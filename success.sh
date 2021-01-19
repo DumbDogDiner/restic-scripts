@@ -20,11 +20,22 @@ generate_success_embed() {
             "fields": [
                 {
                     "name": "Restic Logs",
-                    "value": "\`\`\`$RESTIC_LOGS\`\`\`"
+                    "value": "```$RESTIC_LOGS```"
+                },
+                {
+                    "name": "Snapshots",
+                    "value": "$OUTPUT_SNAPSHOTS",
+                    "inline": true
+                },
+                {
+                    "name": "Files",
+                    "value": "$OUTPUT_FILES",
+                    "inline": true
                 },
                 {
                     "name": "Repository Size",
-                    "value": "$OUTPUT_SIZE"
+                    "value": "$OUTPUT_SIZE",
+                    "inline": true
                 }
             ],
             "thumbnail": {
