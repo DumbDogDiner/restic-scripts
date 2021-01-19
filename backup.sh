@@ -115,7 +115,7 @@ echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats
 echo
 RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE)"
 OUTPUT_DATE="$(date --iso-8601=seconds)"
-OUTPUT_SIZE="$RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
+OUTPUT_SIZE=$(echo $RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')
 cat $LOG_FILE
 echo
 
