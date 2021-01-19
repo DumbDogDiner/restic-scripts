@@ -92,9 +92,9 @@ log Backup complete! Computing statistics...
 RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats)"
 
 OUTPUT_DATE="$(date --iso-8601=seconds)"
-OUTPUT_SNAPSHOTS="$RESTIC_STATS | sed -n -e 's/.*Snapshots processed:   //p' | tr ',' ' ')"
-OUTPUT_FILES="$RESTIC_STATS | sed -n -e 's/.*Total File Count:   //p' | tr ',' ' ')"
-OUTPUT_SIZE="$RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
+OUTPUT_SNAPSHOTS=$("echo '$RESTIC_STATS' | sed -n -e 's/.*Snapshots processed:   //p' | tr ',' ' ')")
+OUTPUT_FILES=$("echo '$RESTIC_STATS' | sed -n -e 's/.*Total File Count:   //p' | tr ',' ' ')")
+OUTPUT_SIZE=$("echo '$RESTIC_STATS' | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')")
 
 # debug logs
 log Backup performed at $OUTPUT_DATE
