@@ -60,6 +60,7 @@ done
 echo
 echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE"
 restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE)
+cat $LOG_FILE
 echo
 
 RESTIC_LOGS=$(cat $LOG_FILE | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
@@ -92,12 +93,13 @@ log Backup complete! Computing statistics...
 echo
 echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats"
 RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats)"
+echo $RESTIC_STATS
 echo
 
 OUTPUT_DATE="$(date --iso-8601=seconds)"
-OUTPUT_SNAPSHOTS=$(echo $RESTIC_STATS | sed -n -e 's/.*Snapshots processed://p' | xargs)
-OUTPUT_FILES=$(echo $RESTIC_STATS | sed -n -e 's/.*Total File Count://p' | xargs)
-OUTPUT_SIZE=$(echo $RESTIC_STATS | sed -n -e 's/.*Total Size://p' | xargs)
+OUTPUT_SNAPSHOTS=$(echo $RESTIC_STATS | grep -Eo "Snapshots processed:   [0-9]+" | sed -n -e 's/.*Snapshots processed://p' | xargs)
+OUTPUT_FILES=$(echo $RESTIC_STATS | grep -Eo "Total File Count:   [0-9]+" | sed -n -e 's/.*Total File Count://p' | xargs)
+OUTPUT_SIZE=$(echo $RESTIC_STATS | grep -Eo "Total Size:   [0-9]+\.[0-9]+ (T|G)iB" | sed -n -e 's/.*Total Size://p' | xargs)
 
 # debug logs
 log Backup performed at $OUTPUT_DATE
