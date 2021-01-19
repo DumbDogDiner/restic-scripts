@@ -21,6 +21,10 @@ generate_success_embed() {
                 {
                     "name": "Restic Logs",
                     "value": "\`\`\`$RESTIC_LOGS\`\`\`"
+                },
+                {
+                    "name": "Repository Size",
+                    "value": "$OUTPUT_SIZE"
                 }
             ],
             "thumbnail": {

@@ -59,6 +59,7 @@ done
 # only have a 400mbit connection to HE in CA, USA, therefore a 300mbit limit is enforced on uploads
 echo
 echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE"
+echo
 restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE --limit-upload 300000 --limit-download 300000 --verbose backup $(echo ${INCLUDE_FILES[@]} | xargs) --exclude-file=$EXCLUDE_FILE | tee $LOG_FILE)
 cat $LOG_FILE
 echo
@@ -111,9 +112,10 @@ log Backup complete! Computing statistics...
 # Set temp env vars
 echo
 echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE"
+echo
 RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE)"
-OUTPUT_SIZE="$RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
 OUTPUT_DATE="$(date --iso-8601=seconds)"
+OUTPUT_SIZE="$RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')"
 cat $LOG_FILE
 echo
 
