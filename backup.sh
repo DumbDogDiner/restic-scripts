@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
-set -uo pipefail
+set -euo pipefail
 
 # load embed generators
 source ./error.sh
 source ./success.sh
 
-# set the environment variables
-INCLUDE_FILE="./restic_include.conf"
-EXCLUDE_FILE="./restic_exclude.conf"
-LOG_FILE="./latest.log"
-WEBHOOK_TOKEN="752196662822436915/UK4gART7nu1CA7lqL0EvCfgevvo87hCvAwN0gbl3BrBQHYFD7DhCTOpp4a4qm3WapEXp"
+# load configuration
+if [[ ! -f ./backup.conf ]]; then
+    echo Could not find configuration file! Cannot proceed.
+    exit 1
+fi;
 
-# set restic variables
-export RESTIC_REPOSITORY="/ovhbkp/restic"
-export RESTIC_PASSWORD_FILE="/opt/bkpsa/.passwd"
+source ./backup.conf
 
 # load the files we need to backup.
 mapfile -t INCLUDE_FILES < $INCLUDE_FILE
