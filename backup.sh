@@ -12,8 +12,9 @@ log() {
 }
 
 # load embed generators
-source ./error.sh
 source ./success.sh
+source ./error.sh
+source ./prune-error.sh
 
 # load configuration
 if [[ ! -f ./backup.conf ]]; then
@@ -88,7 +89,6 @@ if [[ ! $restic_result ]]; then
     exit
 fi
 
-log Backup complete! Computing statistics...
 
 # # calculate statistics
 # echo
@@ -109,16 +109,53 @@ log Backup complete! Computing statistics...
 # printf "\t- %s\n" "Total size: $OUTPUT_SIZE"
 # echo
 
-# Set temp env vars
+log Backup complete! Computing statistics...
 echo
-echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE"
+echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats --mode blobs-per-file | tee $LOG_FILE"
 echo
-RESTIC_STATS="$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats | tee $LOG_FILE)"
-OUTPUT_DATE="$(date --iso-8601=seconds)"
-OUTPUT_SIZE=$(echo $RESTIC_STATS | sed -n -e 's/.*Total Size:   //p' | tr ',' ' ')
+
+RESTIC_STATS=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE stats --mode blobs-per-file | tee $LOG_FILE)
+OUTPUT_DATE=$(date --iso-8601=seconds)
+OUTPUT_SIZE=$(echo $RESTIC_STATS | sed -n -e 's/.*Total Size: //p' | tr ',' ' ')
+
 cat $LOG_FILE
+echo
+
+# print debug info
+log Backup performed at $OUTPUT_DATE
+printf "\t- %s\n" "Total size: $OUTPUT_SIZE"
 echo
 
 # send embed to discord.
 curl -X POST -H "Content-Type: application/json" -d "$(generate_success_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
 log Sent information to Discord.
+
+# only retain the last month of hourly backups, and the last year of monthyl backups.
+# helps to keep repository size reasonable.
+log Cleaning up previous backups...
+echo
+echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE forget --keep-within 1m --keep-monthly 12 --prune | tee $LOG_FILE"
+echo
+
+restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE forget --keep-within 1m --keep-monthly 12 --prune | tee $LOG_FILE)
+
+cat $LOG_FILE
+echo
+
+if [[ ! $restic_result ]]; then
+    log Cleanup failed!
+    
+    # assign error vars
+    RESTIC_ERROR=$(cat $LOG_FILE | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
+
+    # check if empty - avoids bad request errors
+    if [[ -z $RESTIC_ERROR ]]; then
+        RESTIC_ERROR="No logs found."
+    fi
+
+    curl -X POST -H "Content-Type: application/json" -d "$(generate_prune_error_embed)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
+    log Sent information to Discord.
+    exit
+fi
+
+log "Cleanup successful! We're done here UwU~"

@@ -2,20 +2,20 @@
 set -euo pipefail
 
 # generate the success embed
-generate_error_embed() {
+generate_prune_error_embed() {
     cat <<EOF
 {
     "avatar_url": "https://restic.readthedocs.io/en/latest/_static/logo.png",
     "username": "Restic Backup Logs",
     "embeds": [
         {
-            "title": "Backup Failed",
-            "description": "The latest backup was unsuccessful! Any error information will be shown below. When you see this, please contact someone with the SysOps role.",
+            "title": "Repository Prune Failed",
+            "description": "The latest repository cleanup failed! Any error information will be shown below. When you see this, please contact someone with the SysOps role.",
             "url": "https://discordapp.com",
             "color": 16734296,
             "timestamp": "$(date --iso-8601=seconds)",
             "footer": {
-                "text": "Backup performed at"
+                "text": "Cleanup performed at"
             },
             "fields": [
                 {
