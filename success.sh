@@ -5,7 +5,7 @@ set -euo pipefail
 generate_success_embed() {
     cat <<EOF
 {
-    "avatar_url": "https://restic.readthedocs.io/en/latest/_static/logo.png",
+    "avatar_url": "https://raw.githubusercontent.com/dumbdogdiner/restic-scripts/master/assets/restic.png",
     "username": "Restic Backup Logs",
     "embeds": [
         {
@@ -28,7 +28,7 @@ generate_success_embed() {
                 }
             ],
             "thumbnail": {
-                "url": "https://cdn.discordapp.com/emojis/782379848118304808.png"
+                "url": "https://raw.githubusercontent.com/dumbdogdiner/restic-scripts/master/assets/success.png"
             }
         }
     ]

@@ -5,7 +5,7 @@ set -euo pipefail
 generate_prune_error_embed() {
     cat <<EOF
 {
-    "avatar_url": "https://restic.readthedocs.io/en/latest/_static/logo.png",
+    "avatar_url": "https://raw.githubusercontent.com/dumbdogdiner/restic-scripts/master/assets/restic.png",
     "username": "Restic Backup Logs",
     "embeds": [
         {
@@ -28,7 +28,7 @@ generate_prune_error_embed() {
                 }
             ],
             "thumbnail": {
-                "url": "https://raw.githubusercontent.com/NotZachery/notzachery.github.io/master/images/error_light.png"
+                "url": "https://raw.githubusercontent.com/dumbdogdiner/restic-scripts/master/assets/error.png"
             }
         }
     ]
