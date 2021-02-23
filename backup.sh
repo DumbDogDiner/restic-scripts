@@ -134,10 +134,10 @@ log Sent information to Discord.
 # helps to keep repository size reasonable.
 log Cleaning up previous backups...
 echo
-echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE forget --keep-within 1m --keep-monthly 12 --prune | tee $LOG_FILE"
+echo "+ restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE forget --keep-within 1w --keep-weekly 52 --prune | tee $LOG_FILE"
 echo
 
-restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE forget --keep-within 1m --keep-monthly 12 --prune | tee $LOG_FILE)
+restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FILE forget --keep-within 1w --keep-weekly 52 --prune | tee $LOG_FILE)
 
 cat $LOG_FILE
 echo
