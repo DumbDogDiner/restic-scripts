@@ -57,6 +57,9 @@ for file in "${EXCLUDE_FILES[@]}"; do
      printf "\t- %s\n" "$file"
 done
 
+# nice padding uwu
+echo;
+
 # take sql dumps
 log Taking MariaDB SQL dumps...
 mapfile -t MARIADB_DATABASES < $MARIADB_DATABASE_FILE
@@ -65,11 +68,14 @@ mkdir -p $MARIADB_BACKUP_LOCATION
 # iterate through database file and take dumps of each database
 for database in "${MARIADB_DATABASES[@]}"; do
     result=$(docker exec $MARIADB_CONTAINER_NAME mysqldump -u $MARIADB_USERNAME -p$MARIADB_PASSWORD $database > $MARIADB_BACKUP_LOCATION/$database.sql)
-    if [[ !$result ]]; then
+    if [[ ! $result ]]; then
         log Backup of database "$database" failed!
-        curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database PostgreSQL)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
+        curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database MariaDB)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
+        break
     fi
 done
+
+echo;
 
 # take pg dumps
 log Taking PostgreSQL dumps...
@@ -79,9 +85,10 @@ mkdir -p $POSTGRES_BACKUP_LOCATION
 # iterate through database file and take dumps of each database
 for database in "${POSTGRES_DATABASES[@]}"; do
     result=$(docker exec $POSTGRES_CONTAINER_NAME pg_dump -U $POSTGRES_USERNAME $database > $POSTGRES_BACKUP_LOCATION/$database.sql)
-        if [[ !$result ]]; then
+        if [[ ! $result ]]; then
         log Backup of database "$database" failed!
-        curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database MariaDB)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
+        curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database PostgreSQL)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
+        break
     fi
 done
 

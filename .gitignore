@@ -2,4 +2,5 @@ backup.conf
 restic_exclude.conf
 restic_include.conf
 maria_databases.conf
+postgres_databases.conf
 latest.log
