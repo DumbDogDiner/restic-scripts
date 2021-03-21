@@ -63,7 +63,10 @@ mapfile -t MARIADB_DATABASES < $MARIADB_DATABASE_FILE
 mkdir -p $MARIADB_BACKUP_LOCATION
 # iterate through database file and take dumps of each database
 for database in "${MARIADB_DATABASES[@]}"; do
-    docker exec $MARIADB_CONTAINER_NAME mysqldump -u $MARIADB_USERNAME -p$MARIADB_PASSWORD $database > $MARIADB_BACKUP_LOCATION/$database.sql
+    result=$(docker exec $MARIADB_CONTAINER_NAME mysqldump -u $MARIADB_USERNAME -p$MARIADB_PASSWORD $database > $MARIADB_BACKUP_LOCATION/$database.sql)
+    if [[ !$result ]]; then
+        log Backup of database "$database" failed!
+    fi
 done
 
 # take pg dumps
@@ -73,7 +76,10 @@ mapfile -t POSTGRES_DATABASES < $POSTGRES_DATABASE_FILE
 mkdir -p $POSTGRES_BACKUP_LOCATION
 # iterate through database file and take dumps of each database
 for database in "${POSTGRES_DATABASES[@]}"; do
-    docker exec $POSTGRES_CONTAINER_NAME pg_dump -U $POSTGRES_USERNAME $database > $POSTGRES_BACKUP_LOCATION/$database.sql
+    result=$(docker exec $POSTGRES_CONTAINER_NAME pg_dump -U $POSTGRES_USERNAME $database > $POSTGRES_BACKUP_LOCATION/$database.sql)
+        if [[ !$result ]]; then
+        log Backup of database "$database" failed!
+    fi
 done
 
 # perform the backup
