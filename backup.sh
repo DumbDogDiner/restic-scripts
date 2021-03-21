@@ -67,11 +67,10 @@ mapfile -t MARIADB_DATABASES < $MARIADB_DATABASE_FILE
 mkdir -p $MARIADB_BACKUP_LOCATION
 # iterate through database file and take dumps of each database
 for database in "${MARIADB_DATABASES[@]}"; do
-    result=$(docker exec $MARIADB_CONTAINER_NAME mysqldump -u $MARIADB_USERNAME -p$MARIADB_PASSWORD $database > $MARIADB_BACKUP_LOCATION/$database.sql)
-    if [[ ! $result ]]; then
+    result=$(docker exec -it $MARIADB_CONTAINER_NAME mysqldump -u $MARIADB_USERNAME -p$MARIADB_PASSWORD $database > $MARIADB_BACKUP_LOCATION/$database.sql)
+    if [[ $result -ne 0 ]]; then
         log Backup of database "$database" failed!
         curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database MariaDB)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
-        break
     fi
 done
 
@@ -84,11 +83,10 @@ mapfile -t POSTGRES_DATABASES < $POSTGRES_DATABASE_FILE
 mkdir -p $POSTGRES_BACKUP_LOCATION
 # iterate through database file and take dumps of each database
 for database in "${POSTGRES_DATABASES[@]}"; do
-    result=$(docker exec $POSTGRES_CONTAINER_NAME pg_dump -U $POSTGRES_USERNAME $database > $POSTGRES_BACKUP_LOCATION/$database.sql)
-        if [[ ! $result ]]; then
+    result=$(docker exec -it $POSTGRES_CONTAINER_NAME pg_dump -U $POSTGRES_USERNAME $database > $POSTGRES_BACKUP_LOCATION/$database.sql)
+    if [[ $result -ne 0 ]]; then
         log Backup of database "$database" failed!
         curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database PostgreSQL)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
-        break
     fi
 done
 
@@ -103,7 +101,7 @@ echo
 
 RESTIC_LOGS=$(cat $LOG_FILE | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
 
-if [[ ! $restic_result ]]; then
+if [[ $restic_result -ne 0 ]]; then
     log Backup failed!
     
     # assign error vars
@@ -178,7 +176,7 @@ restic_result=$(restic -r $RESTIC_REPOSITORY --password-file $RESTIC_PASSWORD_FI
 cat $LOG_FILE
 echo
 
-if [[ ! $restic_result ]]; then
+if [[ $restic_result -ne 0 ]]; then
     log Cleanup failed!
     
     # assign error vars
