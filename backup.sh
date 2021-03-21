@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-UPDATER_VERSION=0.1.0
+UPDATER_VERSION=0.2.0
 
 printf "\n\u001b[35;1mdddMC - restic-scripts \u001b[36;1mv"
 printf $UPDATER_VERSION
@@ -15,6 +15,7 @@ log() {
 source ./success.sh
 source ./error.sh
 source ./prune-error.sh
+source ./database_dump_error.sh
 
 # load configuration
 if [[ ! -f ./backup.conf ]]; then
@@ -66,6 +67,7 @@ for database in "${MARIADB_DATABASES[@]}"; do
     result=$(docker exec $MARIADB_CONTAINER_NAME mysqldump -u $MARIADB_USERNAME -p$MARIADB_PASSWORD $database > $MARIADB_BACKUP_LOCATION/$database.sql)
     if [[ !$result ]]; then
         log Backup of database "$database" failed!
+        curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database PostgreSQL)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
     fi
 done
 
@@ -79,6 +81,7 @@ for database in "${POSTGRES_DATABASES[@]}"; do
     result=$(docker exec $POSTGRES_CONTAINER_NAME pg_dump -U $POSTGRES_USERNAME $database > $POSTGRES_BACKUP_LOCATION/$database.sql)
         if [[ !$result ]]; then
         log Backup of database "$database" failed!
+        curl -X POST -H "Content-Type: application/json" -d "$(generate_dump_error_embed $database MariaDB)" https://canary.discord.com/api/v8/webhooks/$WEBHOOK_TOKEN
     fi
 done
 
