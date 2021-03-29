@@ -7,10 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/dumbdogdiner/rscripts/internal/app/config"
+	"github.com/dumbdogdiner/rscripts/internal/app/constants"
 )
-
-// The location of the binary download.
-var DownloadUrl string
 
 // DownloadBinary fetches the zipped binary from GitHub releases.
 func DownloadBinary() (*os.File, error) {
@@ -24,7 +22,7 @@ func DownloadBinary() (*os.File, error) {
 		return nil, err
 	}
 	// fetch the data from github.
-	resp, err := http.Get(DownloadUrl)
+	resp, err := http.Get(constants.RepositoryUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +35,7 @@ func DownloadBinary() (*os.File, error) {
 	return downloadFile, nil
 }
 
-// ExtracBinary extracts the downloaded binary into the temporary directory
+// ExtractBinary extracts the downloaded binary into the temporary directory
 // in preparation to move it to the end location.
 func ExtractBinary(src *os.File) (*os.File, error) {
 	configDir, err := config.EnsureConfigDir()
@@ -49,4 +47,5 @@ func ExtractBinary(src *os.File) (*os.File, error) {
 		return nil, err
 	}
 
+	return dest, nil
 }
