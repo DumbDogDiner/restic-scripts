@@ -10,6 +10,7 @@ import (
 	"github.com/dumbdogdiner/rscripts/internal/app/constants"
 )
 
+// Release represents a deserialized release response entry from GitHub.
 type Release struct {
 	TagName     string `json:"tag_name"`
 	PublishedAt string `json:"published_at"`
@@ -51,6 +52,6 @@ func GetLatestVersion() (string, error) {
 	if latestRelease == -1 {
 		return "", errors.New("No releases found.")
 	}
-
+	// return the release
 	return info[latestRelease].TagName, nil
 }
